@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "build",
+    "public": "firebase-recipes-web-app/build",
     "ignore": [
       "firebase.json",
       "**/.*",
