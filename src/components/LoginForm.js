@@ -9,7 +9,7 @@ function LoginForm({ existingUser }){
         event.preventDefault();
 
         try {
-            await FirebaseAuthService.registerUser(username, password);
+            await FirebaseAuthService.loginUser(username, password);
                 setUsername("");
                 setPassword("");
         } catch (error) {
@@ -20,6 +20,28 @@ function LoginForm({ existingUser }){
     function handleLogout(){
         FirebaseAuthService.logoutUser();
     }
+
+    async function handleSendResetPasswordEmail(){
+        if (!username) {
+            alert('Missing username!');
+            return;
+        }
+
+        try {
+           await FirebaseAuthService.sendPasswordResetEmail(username);
+           alert("Sent password resent email");
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // async function handleLoginWithGoogle() {
+    //     try {
+    //       await FirebaseAuthService.loginWithGoogle();  
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // }
     return (
      <div className="login-form-container">
         {
@@ -43,7 +65,7 @@ function LoginForm({ existingUser }){
                     />
                 </label>
                 <label className="input-label login-label">
-                    Passord
+                    Password
                     <input
                         type="password"
                         required
@@ -53,7 +75,21 @@ function LoginForm({ existingUser }){
                     />
                 </label>
                 <div className="button-box">
-                    <button className="primary-button">Submit</button>
+                    <button className="primary-button">Login</button>
+                    <button
+                     type="button"
+                     className="secondary-button"
+                     onClick={handleSendResetPasswordEmail}
+                    >
+                        Password Reset
+                    </button>
+                    {/* <button
+                     type="button"
+                     className="primary-button"
+                     onClick={handleLoginWithGoogle}
+                    >
+                        Login With Google
+                    </button> */}
                 </div>
             </form>
             )}
