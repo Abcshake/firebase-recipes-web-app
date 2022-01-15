@@ -1,5 +1,5 @@
 import firebase from "firebase";
-import FirebaseAuthService from "./FirebaseAuthService";
+//import FirebaseAuthService from "./FirebaseAuthService";
 
 const firestore =  firebase.firestore();
 

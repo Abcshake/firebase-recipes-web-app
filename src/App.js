@@ -18,6 +18,7 @@ function App() {
         console.log(error.message);
         throw error;
       })
+       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   FirebaseAuthService.subscribeToAuthChanges(setUser);
