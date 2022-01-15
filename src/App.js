@@ -23,10 +23,23 @@ function App() {
   FirebaseAuthService.subscribeToAuthChanges(setUser);
 
   async function fetchRecipes() {
+    const queries = [];
+
+    if(!user){
+      queries.push({
+        field: 'isPublished',
+        condition: "==",
+        value: true,
+      });
+    }
+
     let fetchedRecipes = [];
     try {
-      const response = await FirebaseFirestoreService.readDocument("recipes");
-      const newRecipes = response.docs.map((recipe) => {
+      const response = await FirebaseFirestoreService.readDocument({
+        collection: "recipes",
+        queries: queries,
+      });
+      const newRecipes = response.docs.map((recipeDoc) => {
         const id = recipeDoc.id;
         const data = recipeDoc.data();
         data.publishDate = new Date(data.publishDate.seconds*1000);
@@ -60,11 +73,32 @@ function App() {
       //fetch new recipes from firestore
      handleFetchRecipes();
 
-      alert(`successfully created a recipe with an ID = ${responde.id}`)
+      alert(`successfully created a recipe with an ID = ${response.id}`)
     } catch (error) {
       alert(error.message);
     }
   }
+  function lookupCategoryLabel(categoryKey) {
+    const categories = {
+      breadsSandwichesandPizza: "Bread, Sandwiches, and Pizza",
+      eggsAndBreakfast: "Eggs & Breakfast",
+      dessertsandBakedGoods: "Desserts & Baked Goods",
+      fishandSeafood: "Fish & Seafood",
+      vegetables: "Vegetables"
+    };
+    const label = categories[categoryKey];
+    return label;
+  }
+
+  function formatDate(date) {
+    const day = date.getUTCDate();
+    const month = date.getUTCMonth() + 1;
+    const year = date.getFullYear();
+    const dateString = `${month}-${day}-${year}`;
+
+    return dateString;
+  }
+
   return (
     <div className="App">
       <div className="title-row">
@@ -72,6 +106,32 @@ function App() {
           <LoginForm existingUser={user}></LoginForm>
       </div>
       <div className="main">
+        <div className="center">
+          <div className="recipe-list-box">
+            {
+              recipes && recipes.length > 0 ? (
+                <div className="recipe-list">
+                  {
+                    recipes.map((recipe) => {
+                      return (
+                        <div className="recipe-card" key={recipe.id}>
+                          {
+                            recipe.isPublished === false ? (
+                              <div className="unpublished">UNPUBLISHED</div>
+                            ) : null
+                          }
+                          <div className="recipe-name">{recipe.name}</div>
+                          <div className="recipe-field">Category: {lookupCategoryLabel(recipe.category)}</div>
+                          <div className="recipe-field">Publish Date:{formatDate(recipe.publishDate)}</div>
+                        </div>
+                      )
+                    })
+                  }
+                </div>
+              ) : null
+            }
+          </div>
+        </div>
         {
           user ? <AddEditRecipeForm
           handleAddRecipe={handleAddRecipe}
